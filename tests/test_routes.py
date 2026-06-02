@@ -157,3 +157,63 @@ class TestAccountService(TestCase):
         """It should return 404 when requesting an account that does not exist"""
         response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    
+    def test_update_account(self):
+        """It should Update an existing Account"""
+        account = AccountFactory()
+        create_resp = self.client.post(
+        BASE_URL,
+        json=account.serialize(),
+        content_type="application/json"
+        )
+        self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
+        created = create_resp.get_json()
+
+        account_id = created["id"]
+        update_data = created.copy()
+        update_data["name"] = "Updated Name"
+        update_data["email"] = "updated@example.com"
+        update_resp = self.client.put(
+        f"{BASE_URL}/{account_id}",
+        json=update_data,
+        content_type="application/json"
+        )
+        self.assertEqual(update_resp.status_code, status.HTTP_200_OK)
+
+        updated = update_resp.get_json()
+        self.assertEqual(updated["id"], account_id)
+        self.assertEqual(updated["name"], "Updated Name")
+        self.assertEqual(updated["email"], "updated@example.com")
+        self.assertEqual(updated["address"], update_data["address"])
+        self.assertEqual(updated["phone_number"], update_data["phone_number"])
+        self.assertEqual(updated["date_joined"], update_data["date_joined"])
+
+    def test_update_account_not_found(self):
+        """It should not Update an Account that does not exist"""
+        account = AccountFactory()
+        response = self.client.put(
+        f"{BASE_URL}/0",
+        json=account.serialize(),
+        content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_account_wrong_content_type(self):
+        """It should not Update an Account with wrong media type"""
+        account = AccountFactory()
+        create_resp = self.client.post(
+        BASE_URL,
+        json=account.serialize(),
+        content_type="application/json"
+        )
+        self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
+        created = create_resp.get_json()
+        account_id = created["id"]
+
+        response = self.client.put(
+        f"{BASE_URL}/{account_id}",
+        json=created,
+        content_type="text/html"
+        )
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
