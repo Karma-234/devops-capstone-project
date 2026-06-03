@@ -229,3 +229,21 @@ class TestAccountService(TestCase):
         """It should return 204 even when the Account does not exist"""
         response = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_list_accounts(self):
+        """It should return a list of Accounts"""
+        self._create_accounts(5)
+
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_list_accounts_empty(self):
+        """It should return an empty list when no Accounts exist"""
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.get_json()
+        self.assertEqual(len(data), 0)
