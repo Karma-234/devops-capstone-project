@@ -60,19 +60,19 @@ spec:
     - name: source
   params:
     - name: args
-      description: Nose arguments
+      description: Arguments to pass to nose
       type: string
       default: "-v"
-    - name: database_uri
-      description: Database connection string
-      type: string
-      default: "sqlite:///test.db"
+	  - name: database_uri
+	    description: Database connection string
+	    type: string
+	    default: "sqlite:///test.db"
   steps:
     - name: nosetests
       image: python:3.9-slim
       workingDir: $(workspaces.source.path)
       env:
-        - name: DATABASE_URI 
+        - name: DATABASE_URI
           value: $(params.database_uri)
       script: |
         #!/bin/bash
