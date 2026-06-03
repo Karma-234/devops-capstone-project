@@ -156,13 +156,12 @@ class TestAccountService(TestCase):
         self.assertEqual(data["address"], test_account.address)
         self.assertEqual(data["phone_number"], test_account.phone_number)
         self.assertEqual(data["date_joined"], str(test_account.date_joined))
-    
+
     def test_account_not_found(self):
         """It should return 404 when requesting an account that does not exist"""
         response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    
     def test_update_account(self):
         """It should Update an existing Account"""
         account = AccountFactory()
@@ -251,7 +250,7 @@ class TestAccountService(TestCase):
 
         data = response.get_json()
         self.assertEqual(len(data), 0)
-    
+
     def test_security_headers(self):
         """It should return security headers"""
         response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
@@ -264,6 +263,7 @@ class TestAccountService(TestCase):
         }
         for key, value in headers.items():
             self.assertEqual(response.headers.get(key), value)
+
     def test_cors_security(self):
         """It should return CORS header"""
         response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
